@@ -1,5 +1,5 @@
 EXPORTED_FUNCTIONS := _opus_decoder_create _opus_decode_float _opus_decoder_destroy
-EMCCFLAGS := -O3 --pre-js pre.js --post-js post.js
+EMCCFLAGS := -s INVOKE_RUN=0 -O3 --llvm-lto 1 --memory-init-file 0 -s DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=[] -s LIBRARY_DEPS_TO_AUTOEXPORT=[] --pre-js pre.js --post-js post.js
 
 
 noop =
