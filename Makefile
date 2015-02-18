@@ -1,13 +1,19 @@
-CCFLAGS := -O3
+EXPORTED_FUNCTIONS := _opus_decoder_create _opus_decode_float _opus_decoder_destroy
+EMCCFLAGS := -O3 --pre-js pre.js --post-js post.js
+
+
+noop =
+space = $(noop) $(noop)
+comma = ,
+FULL_EMCCFLAGS := $(EMCCFLAGS) -Llibopusbuild/lib -lopus -s EXPORTED_FUNCTIONS=$(subst $(space),$(comma),"[$(foreach func,$(EXPORTED_FUNCTIONS),'$(func)')]")
 
 default: build/libopus.js
 
 build/libopus.js: libopus
 	mkdir -p build
-	emcc $(CCFLAGS) -s EXPORTED_FUNCTIONS="['_opus_decoder_create', '_opus_decode_float', '_opus_decoder_destroy']" -Llibopusbuild/lib -lopus -o $@
+	emcc $(FULL_EMCCFLAGS) -o $@
 	@# emcc does not always exit with status false on error, so ensure previous line succeeded
 	[ -f build/libopus.js ]
-	echo "module.exports = Module" >> build/libopus.js
 
 libopus/config.h: libopus/autogen.sh
 	(cd libopus; ./autogen.sh)
